@@ -115,6 +115,49 @@ class authpluginutils{
 
     }
 
+    //check if authorised
+    public static function is_authorised($apiuser, $apisecret)
+    {
+        global $CFG;
+        //First check that we have an API id and secret
+
+        $apiuser = trim($apiuser);
+        $apisecret = trim($apisecret);
+        if(empty($apiuser)){
+            return false;
+        }
+        if(empty($apisecret)){
+            return false;
+        }
+
+
+        //Fetch from cache and process the results and display
+        $cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'block_rugby', 'token');
+        $tokenobject = $cache->get('recentauthplugintoken');
+
+        //if we have no token object the creds were wrong ... or something
+        if(!($tokenobject)){
+            return false;
+            //if we have an object but its no good, creds werer wrong ..or something
+        }elseif(!property_exists($tokenobject,'token') || empty($tokenobject->token)){
+            return false;
+        }elseif(!property_exists($tokenobject,'subs')){
+            return false;
+        }
+
+
+        //we have enough info to display a report. Lets go.
+        foreach ($tokenobject->subs as $sub){
+            $sub->expiredate = date('d/m/Y',$sub->expiredate);
+        }
+        //Is app authorised
+        if(in_array('block_rugby',$tokenobject->apps)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     //We need an authplugin token to make all this recording and transcripts happen
     public static function fetch_token($apiuser, $apisecret, $force=false)
     {

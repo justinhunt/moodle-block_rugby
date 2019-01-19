@@ -58,11 +58,11 @@ class block_rugby_renderer extends plugin_renderer_base {
 
         //authplugin stuff
         $content .= '<h4>AuthPlugin Info</h4>';
-        $apiuser= get_config('block_rugby','local_authplugin');
-        $apisecret= get_config('block_rugby','local_authplugin');
-        $token = \block_rugby\authpluginutils::fetch_token($apiuser,$apisecret);
+        $apiuser= get_config('block_rugby','apiuser');
+        $apisecret= get_config('block_rugby','apisecret');
+        $authorised = \block_rugby\authpluginutils::is_authorised($apiuser,$apisecret);
         $tokeninfo =\block_rugby\authpluginutils::fetch_token_for_display($apiuser,$apisecret);
-        if($token !='') {
+        if($authorised) {
             $content .= 'Authorised: YES<br>';
         }else{
             $content .= 'Authorised: NO<br>';
